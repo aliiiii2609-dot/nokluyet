@@ -206,9 +206,43 @@
   #hirebtns button{font-size:12px; padding:14px 18px; box-shadow:3px 3px 0 rgba(0,0,0,.6)}
   #dealbtn{border-color:var(--gold); color:#160B24; background:var(--gold)}
 
+  /* ============ CONFESSION DIALOG ============ */
+  #popup{position:fixed; z-index:25; width:min(86vw,340px); pointer-events:auto;
+    background:#160B24; border:2px solid var(--gold);
+    box-shadow:0 0 0 4px #160B24, 0 0 0 6px rgba(255,210,74,.35), 10px 10px 0 rgba(0,0,0,.65);
+    transform:scale(0); transition:transform .3s cubic-bezier(.34,1.9,.64,1)}
+  #popup.show{transform:scale(1)}
+  #popup.shakey{animation:popshake .4s linear}
+  @keyframes popshake{0%,100%{margin-left:0}20%{margin-left:-5px}40%{margin-left:5px}
+    60%{margin-left:-3px}80%{margin-left:3px}}
+  #popbar{display:flex; align-items:center; gap:8px; padding:8px 10px; cursor:move;
+    background:var(--accent-deep); font-family:var(--px); font-size:9px; color:#fff;
+    text-shadow:1px 1px 0 rgba(0,0,0,.5); user-select:none; touch-action:none}
+  #popbar .warn{animation:blink .7s steps(1) infinite}
+  #popbar .ttl{flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis}
+  #popx{width:22px; height:22px; display:grid; place-items:center; font-family:var(--px);
+    font-size:9px; padding:0; border:2px solid rgba(255,255,255,.5); background:rgba(0,0,0,.25); color:#fff}
+  #popbody{padding:12px 14px 14px; display:flex; flex-direction:column; gap:10px; text-align:center}
+  #popimg{width:100%; image-rendering:pixelated; border:2px solid var(--faint); display:block;
+    animation:imgjig 2.4s ease-in-out infinite}
+  @keyframes imgjig{0%,100%{transform:rotate(-.6deg) scale(1)}50%{transform:rotate(.6deg) scale(1.015)}}
+  #popcap{font-family:var(--px); font-size:10px; line-height:1.8; color:var(--milk); min-height:38px}
+  #popcap .cur2{display:inline-block; width:.55em; height:.9em; background:var(--gold);
+    vertical-align:-0.1em; animation:blink .7s steps(1) infinite}
+  #popemoji{font-size:22px; letter-spacing:6px}
+  #popprog{border:2px solid var(--faint); height:14px; position:relative; background:#0B0614}
+  #popfill{height:100%; width:0%; background:repeating-linear-gradient(90deg,var(--gold) 0 6px,#c99a2e 6px 12px);
+    transition:width .3s steps(6)}
+  #poplbl{font-family:var(--vt); font-size:15px; color:var(--dim)}
+  #popbtns{display:flex; gap:8px; justify-content:center}
+  #popbtns button{font-size:9px; padding:10px 12px; box-shadow:2px 2px 0 rgba(0,0,0,.5)}
+  #popbtns button:active{transform:translate(2px,2px); box-shadow:0 0 0}
+  #popyes{border-color:var(--gold); color:var(--gold)}
+
   @media (prefers-reduced-motion:reduce){
     #wordmark.jig span,#bootjelly{animation:none}
     .blink,.blinkfast{animation:none}
+    #popimg,#popbar .warn,#popcap .cur2{animation:none}
   }
   @media (max-width:640px){
     #tagline,#hint{display:none}
@@ -262,6 +296,25 @@
     <button class="modebtn" id="hirebtn">🤝 HIRE ME</button>
   </div>
   <div id="hint">poke. drag. yeet. spacebar to bounce. logo x7 for a secret.</div>
+</div>
+
+<!-- CONFESSION DIALOG -->
+<div id="popup" class="hidden" role="dialog" aria-label="jelly confession">
+  <div id="popbar">
+    <span class="warn">⚠</span><span class="ttl">JELLY_CONFESSION.EXE · caught in 4k</span>
+    <button id="popx" aria-label="close">✕</button>
+  </div>
+  <div id="popbody">
+    <img id="popimg" alt="the founder of this arcade mid bite, allegedly eating jelly" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRXhpZgAATU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAATKADAAQAAAABAAAAbgAAAAD/7QA4UGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAAAA4QklNBCUAAAAAABDUHYzZjwCyBOmACZjs+EJ+/8IAEQgAbgBMAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAMCBAEFAAYHCAkKC//EAMMQAAEDAwIEAwQGBAcGBAgGcwECAAMRBBIhBTETIhAGQVEyFGFxIweBIJFCFaFSM7EkYjAWwXLRQ5I0ggjhU0AlYxc18JNzolBEsoPxJlQ2ZJR0wmDShKMYcOInRTdls1V1pJXDhfLTRnaA40dWZrQJChkaKCkqODk6SElKV1hZWmdoaWp3eHl6hoeIiYqQlpeYmZqgpaanqKmqsLW2t7i5usDExcbHyMnK0NTV1tfY2drg5OXm5+jp6vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAQIAAwQFBgcICQoL/8QAwxEAAgIBAwMDAgMFAgUCBASHAQACEQMQEiEEIDFBEwUwIjJRFEAGMyNhQhVxUjSBUCSRoUOxFgdiNVPw0SVgwUThcvEXgmM2cCZFVJInotIICQoYGRooKSo3ODk6RkdISUpVVldYWVpkZWZnaGlqc3R1dnd4eXqAg4SFhoeIiYqQk5SVlpeYmZqgo6SlpqeoqaqwsrO0tba3uLm6wMLDxMXGx8jJytDT1NXW19jZ2uDi4+Tl5ufo6ery8/T19vf4+fr/2wBDAAMDAwMDAwYDAwYIBgYGCAsICAgICw0LCwsLCw0QDQ0NDQ0NEBAQEBAQEBATExMTExMXFxcXFxoaGhoaGhoaGhr/2wBDAQQEBAYGBgsGBgsbEg8SGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxv/2gAMAwEAAhEDEQAAAePVcXvzn0fLntXDLU2dk72xBe8Rzndxe7UHiaTn3qd5r5nq98/8cD6Xl9VVc3c6L09n5r26kNV1XK3W3rKtseS3uuUPtl2VfWP1a0srWOXuqs+Se3zNp19dr5VY1tG7ZOryp9l5+jjevvHXN185T+kU/WfMvMuu4nfzvZub5vt+btYesUnS8vWOqt6bHpnp6Z/7XlfL3X0JNfNtu3tWvB6Tjp/Kekx6Oo4Ps6PDo6228V7bJPI66y30fzzq744SlFxU3rjuxATHg7Si6Ar/AP/aAAgBAQABBQJdvipKRiiJQaYSpwhGaIKKRC0W/LKoI4kqwqI0JIRIEIi5yqyQkoStoCFCfdeU17reLBuVv3lTCVVmuIwmDc0oM+42sQuN6kkWq8uM7fckNdvFO1WFw8C7mY2qLm7XcGFZSZApR1DlSlaE5A2olS1pQlUiSF398bi5yqjNLgoUmKNSIEkJ5IcfS8gVrt0ZKYWaKpRExDROQY1qUYeWtH0Ac9nylcXeRmGaGCWYrs7lKORIFmxnBsdvmmiksLiRNnbnk3CEyFcK4FeIIkx39jGZYxLdJkuOemW1kuZl2MXIhm/cWB5lrHEiRa0lEnidCAq0uTazxw7feR36EKe12awYxoQXMhcEUO4qZWi4e735vyqBYh26XUo6rcUCXKvlx28yrlKIzEeoPgduiTdxWlolEqkaQKaS7rritbmeyXbTwXaNA5UUNrMq2nnhiubfnR8qXcbaN2O4onSs5O4jTJHtdyoqTfxkUyQpLsdxnsV7hf2d2miHajqE6ohezlVpYyGOe66Z4tWoVZS6PEO30KMVomH8Vh0ku+qT/9oACAEDEQE/ATjAdgTx5chYcPU5xHgPvz/N3kokXFGM/LORPJ0h5fbjXl6DEAZbn27mYhMHpsO7llgot5IBnk+/dB3jJDw4MYiKDV8PX9Vkidojwg8uGqceeN0ykR9wLg66OTiaUTkElHUZK22gv//aAAgBAhEBPwH3S7yx58OODkx7vD02Az+4vsQ/J2RikV4bYQoUGmXh3FJscMZnZbEy8EvUZJxFB93IRw4ZXwHFjqG2SY7JOWZJtE9vJfj+nwyG7cnw5btniNWxhGX2yD1PQZMZvGeNDAHlAT0+O91NP//aAAgBAQAGPwL2TR4iodDrV4U6g6qHU6p4PMjg6ljtothJoSddXylJ19XgphVNWc9PV8uEA0/M6KWaej49vpUAUeUntF4Hqq9X9BoHqt43Aq+ZbEOoFXrRgVr5sqU6p4slJyA83UhhYdC8/J5Rl9Ra1jh5MEugdC1Y/IMoPbR8WWXR175vqerRcJooHsqM+Rf0YqwrHi0o81MgeXm+ZUgPzBDSiRJVUcatNpwPkXyykn5NWOgIBZxNPJ6qJ8tXkpRq+XmdWImvH9ktBrU0aq8fI+jUhXGrikHmGJPLzfMBH8DIGr5qu/8AFyR8mBgS+ZInV4Dgng+f5Vo8O1OxWzyx+LOdBXvJZK4q1T8w+oUUHXuUer5a6UHq6g/YXQOrTKnyf6SteI9oPIvprV+h9HUM5DgyPN6mnfKL7R6usMfLV50On4PR6PIajzalI0YLVR0+9UNY7ZfB/wD/xAAzEAEAAwACAgICAgMBAQAAAgsBEQAhMUFRYXGBkaGxwfDREOHxIDBAUGBwgJCgsMDQ4P/aAAgBAQABPyGXBh2Ue9mZvBaGDW4R444spjXdt38QLRi8/qskn/jYfOpZyPI/1XqGR6dc1MGemfmnQXE+vmgjLo+bxUdOIq+GEu/q+kGDBXapp5E+7sG6WErEE/w+rsf+Cw154dsNlxF50nunfskmny3k8UTJB4qfIfNFkr2/XNS6JrVdcPj3f3wQsMQB7vOn3VBCkghfMRNUcnnn+K0AWuHzj4VDDOLHAx7vjLtrNqP+HG8yVNoNS7DWbLvVMA/4MQjmwIN5Nlb9ZviDV5UWXSef+2eVYakSskkZRB5rk8cx4+ayAgV4cfzduziEsQE2CCBjzcI2lyCfFR6DL6uyKogPYmxc9gXR5EofNMDnyd+6zwjRnibEPRV3+bGDhZxNnBOZihLIPfdHySzsXm8WDX4KIKKDNDm9HksSzZ8iwhkcJeGHgsdcEqRcWUwU8KDssDw0eKEiOt5srP8A45vN2Yz3TCjFJjqvEwd9q6SvC9DYUGweAWObBhPdxUJlzmod6VSnS4WdPy/13rM9NyHd5QHNn1wIeO5+LzmqbXgWDfYqEpFyoXfVHuciLm1GI+bzDaxZpY8mnyKJWp7n1WmKkXmUz6w3m6EfTSbsNZ5Rn82Q8LCho9VzQNua4Qn3VOjFUD7oh8j/AKv/2gAMAwEAAhEDEQAAEFrImBlHyt8rkZ+aLGnQ/AWSe7ysrAKcvyLkP//EADMRAQEBAAMAAQIFBQEBAAEBCQEAESExEEFRYSBx8JGBobHRweHxMEBQYHCAkKCwwNDg/9oACAEDEQE/ELEjI4Y68S+Ua87Ose22zkinPMowv1uXGcyxwM/mhOG5a+HELr9IAx4Yl19KPzAYT07HAY6UiOUuOJy8wHCj1wT6/NyiMGTu7Vywdv/aAAgBAhEBPxDSGZMYGtxNZOHCR14gmBFyVr6xB0E7OIM5eCUm4J7ctOC0gbGrh+0CQ5JT75eyRqwbYWjrX4GC8Ictx04gOcMOcr6fESWiDckfMuRl/9oACAEBAAE/EITgIm8byNAQXd8RGQ1xSVOifEyD8FDJnI5O9Onw1bvieSPKh3SgCq+h8b74qxoECOB7fVAaTK8k+fxzXi/MMnxPxWgCHkppPoxE/KaDXh3LjEJ8wZRTjcMiPDhPddDLiHlH7Hq+EPOROlrPAsnF7+/mppnQHP4liZDIIOIgvpQctg56krMgKa3OAJhVyIpij5GRjjHgHjKTVsAaj55KiG8kpqchH83HDZGJjriIuk1OJj/ylxmYgr5nuxtLrMMv0fYWLuJVCZzo1nUd1tHjyvAI6a98XPLcxGHgLGDxR4dqtUXAiJehnui+K+E0xNkM8mUM50KWMmYIAPG7XTEewh9yqKAzJ3P1ZKuUYQ4bikgiqA17MxSx9R9lVAhZMc7CpVI8TyQ2QaPNjZwBGNMmgCxA8yV2eIlY2W+f7qRLJmLIGUUPAKMHll+PFBhHg6+v5vWxJV0+q9uFhY805i2FRQ5R6ujHl64snBYnydP4qWeCUkMmJlQgnaKJGYFBDCT4+juolybYSKO+OFvEOOwAKE8mepsbxXEHxzRUNR3gvHfc2GCY50iDogrFLbMyyjJmNyqktZW/Ew+rKmEE6UhZzxThxRRMa2OmLL0KMc5OB72vGuvQrlEcT3FzaBgXDzoUmt35zv8AHH4oAEUyCTZNmz335EIZ52aLW2AQCQ9Ks3R2EvKpT7K6nhE4+aTe0eV5+zkpp+wmI9lbeXHCYoyMLpz82MK5UgbJpz3yQdL6qsMYjL8vdKjWVLJDhSK9XAB4Qs8tIAZXHIwlWQ+rhYQcoyEAUxBcowzNMYruD4U2YVHM+drLEj7veMdqjA3fxHyVgKloIHOWSBCVQTDSYubwQIP3SRpoJmek9WU0yHjntEJ5ys8uHEkUg4uTeAIn3/8AbAAnp/gHf8KqAAG1sm+Bz82BJE3l+vN0aCnInX0TdvKZUGcBZwjK8IOcqIOB33YXHNmtQwQOF4TGhZ1gF2QO/qoOBfLzWzEkyPB80OWDsH13+qEGZJukPWXBFwefVMOMWT5Wf/c3RbilHqyX8KqW8ZsePFAQERy8x1zccnQTGJ15qGdSzKwwE1l8T/S//9k=">
+    <div id="popcap"><span class="cur2"></span></div>
+    <div id="popemoji">🍕 😋 🍮</div>
+    <div id="popprog"><div id="popfill"></div></div>
+    <div id="poplbl">converting pizza loyalty to jelly loyalty…</div>
+    <div id="popbtns">
+      <button id="popyes">so real</button>
+      <button id="popno">crumbs detected 🚨</button>
+    </div>
+  </div>
 </div>
 
 <!-- RESULT -->
@@ -514,6 +567,7 @@ const ACH = [
   {id:'rush40',  ic:'⚡', nm:'lowkey cracked', ds:'40+ pokes in wobble rush'},
   {id:'giga',    ic:'👑', nm:'absolute unit', ds:'found the giga jelly'},
   {id:'hr',      ic:'🤝', nm:'down bad for employment', ds:'read the whole application'},
+  {id:'cam',     ic:'📸', nm:'caught in 4k', ds:'witnessed the jelly confession'},
 ];
 const unlocked = new Set(store.get('ach', []));
 let achQueue = [], achShowing = false;
@@ -872,6 +926,7 @@ function setHubUI(on){
   $('modes').classList.toggle('hidden', !on);
   $('flavors').classList.toggle('hidden', !on);
   $('hint').classList.toggle('hidden', !on);
+  if (!on && pop.open) closePopup('');
 }
 function toHub(){
   mode.screen = 'hub';
@@ -1261,7 +1316,97 @@ $('pressstart').addEventListener('click', () => {
     setTimeout(openFactory, 350);
   }
   emojiBurst(W/2, H/2, ['🍮','✨','🫧'], 20);
+  schedulePopup(12000);
 });
+
+/* ============ CONFESSION DIALOG ============ */
+const pop = { open:false, timers:[], emojiSets:[['🍕','😋','🍮'],['😋','🍮','🤤'],['🍮','🤤','✨'],['🤳','🍕','🫶'],['🍮','🍮','🍮']] };
+const POP_CAP = 'how i be eating jelly.\n(ok. its pizza. pizza looks great tho.)';
+function schedulePopup(delay){
+  clearTimeout(pop.schedT);
+  pop.schedT = setTimeout(() => {
+    if (mode.screen === 'hub' && !pop.open) openPopup();
+    else schedulePopup(20000);
+  }, delay);
+}
+function openPopup(){
+  pop.open = true;
+  const el = $('popup');
+  el.classList.remove('hidden');
+  el.style.left = Math.max(10, innerWidth/2 - 170 + (Math.random()*160-80)) + 'px';
+  el.style.top = Math.max(60, innerHeight*0.16 + Math.random()*40) + 'px';
+  requestAnimationFrame(()=>el.classList.add('show'));
+  sfx.coin();
+  award('cam');
+  /* typewriter */
+  let i = 0;
+  $('popcap').innerHTML = '<span class="cur2"></span>';
+  pop.timers.push(setInterval(() => {
+    if (i < POP_CAP.length){
+      i++;
+      $('popcap').innerHTML = POP_CAP.slice(0,i).replace(/\n/g,'<br>') + '<span class="cur2"></span>';
+      if (POP_CAP[i-1] !== ' ') sfx.type();
+    }
+  }, 45));
+  /* emoji cycler */
+  let e = 0;
+  pop.timers.push(setInterval(() => {
+    e++;
+    $('popemoji').textContent = pop.emojiSets[e % pop.emojiSets.length].join(' ');
+  }, 420));
+  /* progress bar crawls to 99 and gives up */
+  let p = 0;
+  pop.timers.push(setInterval(() => {
+    p = Math.min(99, p + Math.ceil(Math.random()*9));
+    $('popfill').style.width = p + '%';
+    $('poplbl').textContent = p < 99 ? 'converting pizza loyalty to jelly loyalty… ' + p + '%'
+      : 'stuck at 99%. pizza put up a fight.';
+  }, 380));
+  /* random shake */
+  pop.timers.push(setInterval(() => {
+    if (Math.random() < 0.4 && !reduceMotion){
+      el.classList.remove('shakey'); void el.offsetWidth; el.classList.add('shakey');
+    }
+  }, 3200));
+}
+function closePopup(msg){
+  const el = $('popup');
+  el.classList.remove('show');
+  pop.timers.forEach(clearInterval); pop.timers = [];
+  setTimeout(()=>el.classList.add('hidden'), 320);
+  pop.open = false;
+  if (msg) toast(msg);
+  schedulePopup(90000 + Math.random()*90000);
+}
+$('popx').addEventListener('click', () => { sfx.pop(300); closePopup(''); });
+$('popyes').addEventListener('click', () => {
+  sfx.ding();
+  emojiBurst(W/2, H/2, ['🍕','🍮','😋','✨'], 20);
+  closePopup('certified jelly eater. the pizza was research.');
+});
+$('popno').addEventListener('click', () => {
+  sfx.spicy(); shake(4);
+  closePopup('the crumbs stay IN the picture.');
+});
+/* draggable title bar */
+(() => {
+  const el = $('popup'), bar = $('popbar');
+  let dx=0, dy=0, dragging=false;
+  bar.addEventListener('pointerdown', e => {
+    if (e.target.id === 'popx') return;
+    dragging = true;
+    bar.setPointerCapture(e.pointerId);
+    const r = el.getBoundingClientRect();
+    dx = e.clientX - r.left; dy = e.clientY - r.top;
+  });
+  bar.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    el.style.left = Math.min(innerWidth-60, Math.max(-100, e.clientX - dx)) + 'px';
+    el.style.top = Math.min(innerHeight-40, Math.max(0, e.clientY - dy)) + 'px';
+  });
+  bar.addEventListener('pointerup', () => { dragging = false; });
+  bar.addEventListener('pointercancel', () => { dragging = false; });
+})();
 
 /* tagline rotator */
 let tagIdx = 0;
