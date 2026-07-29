@@ -62,8 +62,9 @@
     letter-spacing:.06em}
   #bootlogo{font-family:var(--px); font-size:clamp(26px,6.5vw,58px); letter-spacing:.04em;
     color:var(--accent); text-shadow:4px 4px 0 #5D1230, 0 0 34px var(--glow)}
-  #bootjelly{font-size:clamp(64px,12vw,110px); line-height:1; filter:drop-shadow(0 10px 30px var(--glow));
-    animation:squish 1.6s cubic-bezier(.34,1.56,.64,1) infinite}
+  #bootjelly{width:clamp(150px,24vw,230px); line-height:0; filter:drop-shadow(0 10px 30px var(--glow));
+    transform-origin:50% 88%; animation:squish 1.6s cubic-bezier(.34,1.56,.64,1) infinite}
+  #bootjelly svg{width:100%; height:auto; display:block}
   @keyframes squish{0%,100%{transform:scale(1)}30%{transform:scale(1.14,.82)}
     60%{transform:scale(.9,1.12)}80%{transform:scale(1.05,.95)}}
   #pressstart{font-family:var(--px); font-size:clamp(12px,2.4vw,18px); color:var(--gold);
@@ -275,7 +276,43 @@
 <div id="boot">
   <div class="inner">
     <div id="mystery">is it a snack?</div>
-    <div id="bootjelly">🍮</div>
+    <div id="bootjelly" aria-hidden="true">
+      <svg viewBox="0 0 220 168" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="jbody" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FF9DBE"/>
+            <stop offset=".55" stop-color="#FF6B9C"/>
+            <stop offset="1" stop-color="#D93A70"/>
+          </linearGradient>
+          <clipPath id="jclip">
+            <path d="M30 130 Q30 40 110 40 Q190 40 190 130 Q190 146 174 146 L46 146 Q30 146 30 130 Z"/>
+          </clipPath>
+        </defs>
+        <ellipse cx="110" cy="150" rx="96" ry="14" fill="#1E0E30"/>
+        <ellipse cx="110" cy="146" rx="88" ry="12" fill="#F6EEF7"/>
+        <ellipse cx="110" cy="143" rx="66" ry="8" fill="#E2CFE6"/>
+        <path d="M30 130 Q30 40 110 40 Q190 40 190 130 Q190 146 174 146 L46 146 Q30 146 30 130 Z" fill="url(#jbody)"/>
+        <g clip-path="url(#jclip)" fill="#FFD9E8">
+          <ellipse cx="110" cy="68" rx="66" ry="32"/>
+          <circle cx="56" cy="88" r="11"/>
+          <circle cx="83" cy="97" r="12"/>
+          <circle cx="110" cy="101" r="13"/>
+          <circle cx="137" cy="97" r="12"/>
+          <circle cx="164" cy="88" r="11"/>
+        </g>
+        <ellipse cx="78" cy="58" rx="17" ry="8" fill="#FFFFFF" opacity=".55" transform="rotate(-18 78 58)"/>
+        <circle cx="142" cy="56" r="5" fill="#FFFFFF" opacity=".4"/>
+        <circle cx="88" cy="118" r="7" fill="#3A1230"/>
+        <circle cx="90.5" cy="115.5" r="2.4" fill="#FFFFFF" opacity=".9"/>
+        <circle cx="132" cy="118" r="7" fill="#3A1230"/>
+        <circle cx="134.5" cy="115.5" r="2.4" fill="#FFFFFF" opacity=".9"/>
+        <path d="M100 128 Q110 137 120 128" stroke="#3A1230" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <ellipse cx="70" cy="124" rx="8" ry="5" fill="#F27BAA" opacity=".6"/>
+        <ellipse cx="150" cy="124" rx="8" ry="5" fill="#F27BAA" opacity=".6"/>
+        <path d="M24 30 L26.2 37.8 L34 40 L26.2 42.2 L24 50 L21.8 42.2 L14 40 L21.8 37.8 Z" fill="#FFD24A" opacity=".9"/>
+        <path d="M196 46 L197.6 51.4 L203 53 L197.6 54.6 L196 60 L194.4 54.6 L189 53 L194.4 51.4 Z" fill="#FFD24A" opacity=".8"/>
+      </svg>
+    </div>
     <div id="bootlogo">NOKLUYET</div>
     <div id="bootsub">the official unofficial jelly arcade</div>
     <button id="pressstart" class="blink">▶ PRESS START</button>
