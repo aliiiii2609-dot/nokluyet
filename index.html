@@ -1,0 +1,1165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>nokluyet · the jellyverse</title>
+<meta name="description" content="the softest corner of the internet. poke the jelly. become the jelly.">
+<meta property="og:title" content="nokluyet · the jellyverse">
+<meta property="og:description" content="no thoughts. just wobble. 🍮">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍮</text></svg>">
+<style>
+  :root{
+    --bg0:#12081D; --bg1:#2A1140;
+    --milk:#FBF3F7; --dim:rgba(251,243,247,.55); --faint:rgba(251,243,247,.14);
+    --accent:#FF6B9C; --accent-deep:#E43F77; --glow:rgba(255,107,156,.30);
+    --chip:rgba(251,243,247,.07);
+    --display:'Arial Rounded MT Bold','SF Pro Rounded',ui-rounded,'Nunito','Quicksand',system-ui,sans-serif;
+    --body:system-ui,-apple-system,'Segoe UI',sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg0); color:var(--milk); font-family:var(--body);
+    overflow:hidden; touch-action:none; -webkit-user-select:none; user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #stage{position:fixed; inset:0; display:block; cursor:grab}
+  #stage.grabbing{cursor:grabbing}
+
+  .hud{position:fixed; z-index:5; pointer-events:none}
+  .hud > *{pointer-events:auto}
+  .hidden{display:none !important}
+
+  /* ============ SPLASH ============ */
+  #splash{
+    position:fixed; inset:0; z-index:50; display:grid; place-items:center;
+    background:radial-gradient(120% 100% at 50% 30%, #2A1140 0%, #12081D 70%);
+    transition:opacity .6s ease, visibility .6s;
+  }
+  #splash.gone{opacity:0; visibility:hidden}
+  #splash .inner{text-align:center; display:flex; flex-direction:column; align-items:center; gap:26px; padding:20px}
+  #bigjelly{font-size:clamp(90px,18vw,150px); line-height:1; filter:drop-shadow(0 14px 40px var(--glow));
+    animation:squish 1.6s cubic-bezier(.34,1.56,.64,1) infinite}
+  @keyframes squish{
+    0%,100%{transform:scale(1,1) translateY(0)} 30%{transform:scale(1.14,.82) translateY(6%)}
+    60%{transform:scale(.9,1.12) translateY(-6%)} 80%{transform:scale(1.05,.95) translateY(0)}
+  }
+  #splashword{font-family:var(--display); font-weight:800; font-size:clamp(44px,9vw,84px);
+    letter-spacing:.01em; display:flex}
+  #splashword span{display:inline-block; opacity:0; transform:translateY(40px) scale(.6);
+    animation:popin .6s cubic-bezier(.34,1.8,.64,1) forwards;
+    background:linear-gradient(180deg,var(--milk) 20%,var(--accent) 135%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+  @keyframes popin{to{opacity:1; transform:translateY(0) scale(1)}}
+  #splashsub{font-size:14px; letter-spacing:.22em; text-transform:uppercase; color:var(--dim); font-weight:700}
+  #loadline{font-family:var(--mono); font-size:13px; color:var(--dim); min-height:20px}
+  #enter{
+    font-family:var(--display); font-weight:800; font-size:clamp(17px,2.4vw,21px);
+    padding:16px 38px; border:none; border-radius:999px; cursor:pointer; color:#2A0A1C;
+    background:linear-gradient(180deg,var(--accent),var(--accent-deep));
+    box-shadow:0 10px 40px var(--glow), inset 0 2px 0 rgba(255,255,255,.4);
+    opacity:0; transform:scale(.7); pointer-events:none;
+    transition:transform .2s cubic-bezier(.34,1.8,.64,1);
+    animation:enterin .5s cubic-bezier(.34,1.8,.64,1) 2.2s forwards;
+    color:var(--milk);
+  }
+  @keyframes enterin{to{opacity:1; transform:scale(1); pointer-events:auto}}
+  #enter:hover{transform:scale(1.07) rotate(-1.5deg)}
+  #enter:active{transform:scale(.93)}
+  #splash .fineprint{position:absolute; bottom:max(18px,env(safe-area-inset-bottom)); font-size:11.5px;
+    color:rgba(251,243,247,.35); letter-spacing:.08em}
+
+  /* ============ BRAND ============ */
+  #brand{top:max(16px,env(safe-area-inset-top)); left:20px; line-height:1}
+  #wordmark{font-family:var(--display); font-weight:800; font-size:clamp(28px,4.4vw,44px);
+    letter-spacing:.01em; display:flex; cursor:pointer; border:none; background:none; padding:0}
+  #wordmark span{display:inline-block;
+    background:linear-gradient(180deg,var(--milk) 20%,var(--accent) 130%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    transform-origin:50% 90%}
+  #wordmark.jig span{animation:jig .55s cubic-bezier(.34,1.56,.64,1) both}
+  #wordmark.jig span:nth-child(odd){animation-name:jig2}
+  #wordmark span:nth-child(1){animation-delay:0s}#wordmark span:nth-child(2){animation-delay:.03s}
+  #wordmark span:nth-child(3){animation-delay:.06s}#wordmark span:nth-child(4){animation-delay:.09s}
+  #wordmark span:nth-child(5){animation-delay:.12s}#wordmark span:nth-child(6){animation-delay:.15s}
+  #wordmark span:nth-child(7){animation-delay:.18s}#wordmark span:nth-child(8){animation-delay:.21s}
+  @keyframes jig{0%{transform:scale(1)}25%{transform:scale(1.25,.7)}50%{transform:scale(.85,1.2)}
+    72%{transform:scale(1.08,.94)}100%{transform:scale(1)}}
+  @keyframes jig2{0%{transform:scale(1)}25%{transform:scale(.75,1.25)}50%{transform:scale(1.18,.86)}
+    72%{transform:scale(.95,1.06)}100%{transform:scale(1)}}
+  #tagline{margin-top:7px; font-size:13px; color:var(--dim); letter-spacing:.1em; text-transform:uppercase;
+    font-weight:700; transition:opacity .4s; min-height:17px}
+  #tagline.fade{opacity:0}
+
+  /* ============ TOP RIGHT ============ */
+  #topright{top:max(16px,env(safe-area-inset-top)); right:18px; display:flex; gap:9px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+  .chip{background:var(--chip); border:1px solid var(--faint); border-radius:999px;
+    padding:9px 15px; font-family:var(--mono); font-size:14px; font-variant-numeric:tabular-nums;
+    color:var(--milk); display:flex; align-items:center; gap:8px; backdrop-filter:blur(8px)}
+  .chip b{color:var(--accent); font-weight:700}
+  #hearts{letter-spacing:2px; font-size:13px}
+  #timerbar{position:fixed; top:0; left:0; height:5px; background:linear-gradient(90deg,var(--accent),var(--accent-deep));
+    width:100%; z-index:6; transform-origin:left; box-shadow:0 0 14px var(--glow)}
+  button{font-family:var(--display); color:var(--milk); background:var(--chip);
+    border:1px solid var(--faint); border-radius:999px; cursor:pointer}
+  button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .iconbtn{width:40px; height:40px; font-size:17px; display:grid; place-items:center; font-family:var(--body);
+    transition:transform .15s}
+  .iconbtn:hover{transform:scale(1.12)}
+  .iconbtn[aria-pressed="true"]{background:rgba(251,243,247,.16)}
+
+  /* ============ BOTTOM ============ */
+  #bottom{left:0; right:0; bottom:max(18px,env(safe-area-inset-bottom));
+    display:flex; flex-direction:column; align-items:center; gap:13px}
+  #flavors{display:flex; gap:13px; align-items:center}
+  .swatch{width:33px; height:33px; border-radius:50% 50% 46% 46%; border:none; cursor:pointer; position:relative;
+    transition:transform .25s cubic-bezier(.34,1.8,.64,1); padding:0;
+    box-shadow:inset 0 -6px 10px rgba(0,0,0,.28), inset 0 4px 6px rgba(255,255,255,.45), 0 4px 14px rgba(0,0,0,.35)}
+  .swatch::after{content:""; position:absolute; left:22%; top:14%; width:34%; height:22%;
+    border-radius:50%; background:rgba(255,255,255,.75)}
+  .swatch:hover{transform:scale(1.18) rotate(-4deg)}
+  .swatch[aria-pressed="true"]{transform:scale(1.28); box-shadow:inset 0 -6px 10px rgba(0,0,0,.28),
+    inset 0 4px 6px rgba(255,255,255,.45), 0 0 0 3px var(--bg0), 0 0 0 5px var(--accent)}
+  #modes{display:flex; gap:11px; flex-wrap:wrap; justify-content:center}
+  .modebtn{font-size:15.5px; font-weight:800; padding:12px 22px; letter-spacing:.02em;
+    background:linear-gradient(180deg,var(--accent),var(--accent-deep)); border:none;
+    box-shadow:0 6px 22px var(--glow), inset 0 2px 0 rgba(255,255,255,.35);
+    transition:transform .2s cubic-bezier(.34,1.8,.64,1)}
+  .modebtn:hover{transform:scale(1.07) rotate(-1deg)}
+  .modebtn:active{transform:scale(.93)}
+  .modebtn.ghost{background:var(--chip); border:1px solid var(--faint); box-shadow:none}
+  #hint{font-size:12.5px; color:var(--dim); letter-spacing:.05em}
+
+  /* ============ TOASTS & COMBO ============ */
+  #toast{left:50%; top:16%; transform:translateX(-50%) scale(.6); opacity:0;
+    font-family:var(--display); font-weight:800; font-size:clamp(24px,4vw,42px);
+    color:var(--milk); text-shadow:0 4px 24px var(--glow);
+    transition:all .3s cubic-bezier(.34,1.8,.64,1); white-space:nowrap; z-index:7}
+  #toast.show{opacity:1; transform:translateX(-50%) scale(1)}
+  #combo{left:50%; top:26%; transform:translateX(-50%) scale(0); opacity:0;
+    font-family:var(--display); font-weight:800; font-size:clamp(30px,6vw,64px);
+    background:linear-gradient(180deg,#FFE27A,#FF9D3B); -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; filter:drop-shadow(0 4px 18px rgba(255,180,60,.5));
+    transition:all .22s cubic-bezier(.34,2,.64,1); white-space:nowrap; z-index:7}
+  #combo.show{opacity:1; transform:translateX(-50%) scale(1)}
+
+  /* ============ ACHIEVEMENTS ============ */
+  #achpop{left:50%; top:max(74px,calc(env(safe-area-inset-top) + 62px)); transform:translateX(-50%) translateY(-30px); opacity:0;
+    background:linear-gradient(180deg,rgba(255,226,122,.16),rgba(251,243,247,.06));
+    border:1px solid rgba(255,226,122,.4); border-radius:18px; padding:12px 20px;
+    display:flex; gap:12px; align-items:center; backdrop-filter:blur(10px);
+    transition:all .4s cubic-bezier(.34,1.8,.64,1); z-index:8}
+  #achpop.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  #achpop .tr{font-size:26px}
+  #achpop .tt{font-family:var(--display); font-weight:800; font-size:15px; color:#FFE27A}
+  #achpop .td{font-size:12.5px; color:var(--dim)}
+  #achpanel{inset:0; z-index:20; display:grid; place-items:center;
+    background:rgba(12,5,20,.75); backdrop-filter:blur(12px)}
+  .card{text-align:center; padding:34px 38px; border-radius:30px;
+    background:linear-gradient(180deg,rgba(251,243,247,.09),rgba(251,243,247,.03));
+    border:1px solid var(--faint); max-width:min(88vw,460px); max-height:82vh; overflow-y:auto}
+  .card h2{font-family:var(--display); font-size:clamp(24px,3.6vw,34px); font-weight:800;
+    background:linear-gradient(180deg,var(--milk),var(--accent)); -webkit-background-clip:text;
+    background-clip:text; -webkit-text-fill-color:transparent; text-wrap:balance; margin-bottom:6px}
+  .card .sub{color:var(--dim); font-size:14px; margin-bottom:20px}
+  .achrow{display:flex; gap:13px; align-items:center; text-align:left; padding:10px 12px; border-radius:14px;
+    background:rgba(251,243,247,.04); margin-bottom:8px}
+  .achrow.locked{opacity:.38; filter:grayscale(.8)}
+  .achrow .ic{font-size:24px; width:32px; text-align:center}
+  .achrow .nm{font-family:var(--display); font-weight:800; font-size:14.5px}
+  .achrow .ds{font-size:12.5px; color:var(--dim)}
+  .card .row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:18px}
+  .card button{font-size:15px; font-weight:800; padding:12px 24px}
+  .card .primary{background:linear-gradient(180deg,var(--accent),var(--accent-deep)); border:none;
+    box-shadow:0 6px 22px var(--glow), inset 0 2px 0 rgba(255,255,255,.35)}
+  .card p{margin:10px 0 4px; color:var(--dim); font-size:15px}
+  .card p b{color:var(--milk); font-family:var(--mono)}
+  .card .rank{font-size:clamp(19px,2.6vw,24px); font-family:var(--display); font-weight:800; color:#FFE27A;
+    margin:8px 0 2px}
+  #overlay{inset:0; display:grid; place-items:center; background:rgba(12,5,20,.72);
+    backdrop-filter:blur(10px); z-index:19}
+
+  /* ============ NAME MODAL ============ */
+  #namemodal{inset:0; z-index:21; display:grid; place-items:center; background:rgba(12,5,20,.75); backdrop-filter:blur(12px)}
+  #nameinput{font-family:var(--display); font-weight:800; font-size:22px; text-align:center;
+    background:rgba(251,243,247,.08); border:1px solid var(--faint); border-radius:16px;
+    padding:14px 18px; color:var(--milk); width:min(76vw,300px); outline:none}
+  #nameinput:focus{border-color:var(--accent)}
+
+  @media (prefers-reduced-motion:reduce){
+    #wordmark.jig span,#bigjelly{animation:none}
+    #splashword span{animation-duration:.01s}
+    #enter{animation-delay:.3s}
+  }
+  @media (max-width:640px){
+    #tagline{display:none}
+    #hint{display:none}
+    .chip{padding:8px 12px; font-size:13px}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stage" aria-label="a wobbly jelly you can poke, drag and fling"></canvas>
+<div id="timerbar" class="hidden"></div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="inner">
+    <div id="bigjelly">🍮</div>
+    <div id="splashword" aria-label="nokluyet"></div>
+    <div id="splashsub">the jellyverse</div>
+    <div id="loadline">warming up the wobble…</div>
+    <button id="enter">enter the jellyverse</button>
+  </div>
+  <div class="fineprint">100% organic pixels · zero thoughts inside</div>
+</div>
+
+<!-- HUD -->
+<div class="hud" id="brand">
+  <button id="wordmark" aria-label="nokluyet, click for a secret"></button>
+  <div id="tagline">no thoughts. just wobble.</div>
+</div>
+
+<div class="hud" id="topright">
+  <div class="chip"><span id="scorelabel">jiggles</span> <b id="score">0</b><span id="hearts" hidden></span></div>
+  <button class="iconbtn" id="achbtn" aria-label="achievements" title="trophies">🏆</button>
+  <button class="iconbtn" id="musicbtn" aria-label="toggle music" aria-pressed="true" title="wobble beats">🎵</button>
+  <button class="iconbtn" id="mute" aria-label="toggle sound effects" aria-pressed="false" title="sfx">🔊</button>
+  <button class="iconbtn" id="sharebtn" aria-label="share" title="spread the wobble">📤</button>
+</div>
+
+<div class="hud" id="toast" aria-live="polite"></div>
+<div class="hud" id="combo"></div>
+<div class="hud" id="achpop"><span class="tr">🏆</span><span><div class="tt" id="achtitle"></div><div class="td" id="achdesc"></div></span></div>
+
+<div class="hud" id="bottom">
+  <div id="flavors" role="group" aria-label="pick a flavor"></div>
+  <div id="modes">
+    <button class="modebtn" id="catchbtn">🍓 catch 'em</button>
+    <button class="modebtn" id="rushbtn">⚡ wobble rush</button>
+    <button class="modebtn ghost" id="namebtn">✏️ name your jelly</button>
+  </div>
+  <div id="hint">poke it. drag it. yeet it. it forgives you. (psst: click the logo 7 times)</div>
+</div>
+
+<!-- RESULT OVERLAY -->
+<div class="hud hidden" id="overlay">
+  <div class="card">
+    <h2 id="cardtitle">round over</h2>
+    <div class="rank" id="cardrank"></div>
+    <p id="cardtext"></p>
+    <div class="row">
+      <button class="primary" id="again">run it back</button>
+      <button id="chill">just fiddle</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACHIEVEMENTS PANEL -->
+<div class="hud hidden" id="achpanel">
+  <div class="card">
+    <h2>trophy cabinet</h2>
+    <div class="sub" id="achcount"></div>
+    <div id="achlist"></div>
+    <div class="row"><button class="primary" id="achclose">back to wobbling</button></div>
+  </div>
+</div>
+
+<!-- NAME MODAL -->
+<div class="hud hidden" id="namemodal">
+  <div class="card">
+    <h2>name your jelly</h2>
+    <div class="sub">this is a lifelong commitment btw</div>
+    <input id="nameinput" maxlength="14" placeholder="sir wobbleton" autocomplete="off">
+    <div class="row">
+      <button class="primary" id="namesave">adopt</button>
+      <button id="namecancel">nvm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const cv = $('stage'), cx = cv.getContext('2d');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let W=0, H=0, DPR=1, FLOOR=0;
+function resize(){
+  DPR = Math.min(devicePixelRatio||1, 2);
+  W = innerWidth; H = innerHeight;
+  cv.width = W*DPR; cv.height = H*DPR;
+  cv.style.width = W+'px'; cv.style.height = H+'px';
+  FLOOR = H - Math.max(70, H*0.10);
+}
+addEventListener('resize', resize); resize();
+
+/* ================= STORAGE ================= */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('nkl-'+k); return v===null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('nkl-'+k, JSON.stringify(v)); }catch(e){} },
+};
+
+/* ================= COPY ================= */
+const TAGLINES = [
+  'no thoughts. just wobble.',
+  "it's giving dessert.",
+  'the softest website on the internet.',
+  'touch grass? nah. touch jelly.',
+  'aura: unlimited. cap: zero.',
+  'certified jiggle physics fr.',
+  'pov: you found the good website.',
+  'wobble responsibly.',
+];
+const PRAISE = ['SHEEEESH','W JELLY','NO CAP','GOATED','BUSSIN','ABSOLUTE CINEMA','CORE MEMORY UNLOCKED','PEAK JIGGLE','LOWKEY ICONIC','RIZZ +1000'];
+const LOADLINES = ['warming up the wobble…','injecting rizz…','calibrating jiggle physics…','downloading aura…','teaching jelly to feel joy…','polishing the gloss…'];
+const COMBO_TIERS = [
+  [30,'ABSOLUTE CINEMA'],[20,'GOATED FR'],[15,'SHEEEESH'],[10,'SHEESH'],[5,'nice.'],
+];
+function praise(){ return PRAISE[Math.floor(Math.random()*PRAISE.length)]; }
+
+/* ================= FLAVORS ================= */
+const FLAVORS = [
+  {id:'strawberry', name:'strawberry', top:'#FF9DBE', main:'#FF6B9C', deep:'#D93A70', glow:'rgba(255,107,156,.30)'},
+  {id:'mango',      name:'mango',      top:'#FFD48A', main:'#FFB347', deep:'#E8821E', glow:'rgba(255,179,71,.30)'},
+  {id:'lychee',     name:'lychee',     top:'#FFF0F6', main:'#FFD9E8', deep:'#F0A9C9', glow:'rgba(255,217,232,.30)'},
+  {id:'blueberry',  name:'blueberry',  top:'#B7B4FF', main:'#8E8AFF', deep:'#5D55E0', glow:'rgba(142,138,255,.32)'},
+  {id:'matcha',     name:'matcha',     top:'#CBEEB4', main:'#A8DE8B', deep:'#6FBF57', glow:'rgba(168,222,139,.30)'},
+];
+let flavor = FLAVORS[0];
+const flavorsTried = new Set(store.get('flavors', ['strawberry']));
+let giga = false, gigaHue = 0;
+
+function hexA(hex, a){
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;
+}
+function jellyColors(){
+  if (giga){
+    const h = gigaHue;
+    return {
+      top:`hsla(${h},95%,82%,.95)`, main:`hsla(${h},90%,68%,.93)`, deep:`hsla(${h},85%,50%,.96)`,
+      glow:`hsla(${h},95%,65%,.32)`, solid:`hsl(${h},90%,70%)`, solid2:`hsl(${(h+40)%360},90%,80%)`,
+    };
+  }
+  return { top:hexA(flavor.top,.95), main:hexA(flavor.main,.93), deep:hexA(flavor.deep,.96),
+    glow:flavor.glow, solid:flavor.main, solid2:flavor.top };
+}
+
+/* ================= AUDIO ================= */
+const sfx = (() => {
+  let ac = null, muted = false, last = 0;
+  let musicOn = true, musicNodes = null, musicTimer = null, beat = 0;
+  function ctx(){
+    if(!ac){ try{ ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+    if (ac && ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  function blip(freq, dur, type, vol, slideTo){
+    if (muted) return;
+    const a = ctx(); if(!a) return;
+    const now = a.currentTime;
+    const o = a.createOscillator(), g = a.createGain(), f = a.createBiquadFilter();
+    o.type = type; f.type='lowpass'; f.frequency.value = 1600;
+    o.frequency.setValueAtTime(freq, now);
+    o.frequency.exponentialRampToValueAtTime(Math.max(50, slideTo || freq*0.55), now+dur);
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(vol, now+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+    o.connect(f).connect(g).connect(a.destination);
+    o.start(now); o.stop(now+dur+0.02);
+  }
+  /* chill wobble-bass loop */
+  const BASSLINE = [55, 55, 41.2, 49, 55, 65.4, 49, 36.7];
+  function startMusic(){
+    const a = ctx(); if(!a || musicNodes) return;
+    const master = a.createGain(); master.gain.value = musicOn ? 0.05 : 0;
+    const bass = a.createOscillator(); bass.type = 'sawtooth';
+    const bg = a.createGain(); bg.gain.value = 0.9;
+    const lp = a.createBiquadFilter(); lp.type='lowpass'; lp.Q.value = 8;
+    const lfo = a.createOscillator(); lfo.frequency.value = 2.2;
+    const lfoG = a.createGain(); lfoG.gain.value = 260;
+    lp.frequency.value = 380;
+    lfo.connect(lfoG).connect(lp.frequency);
+    bass.connect(bg).connect(lp).connect(master).connect(a.destination);
+    bass.start(); lfo.start();
+    musicNodes = { master, bass };
+    const stepDur = 60/92/2; /* 92 bpm, 8th notes */
+    let nextT = a.currentTime + 0.1;
+    musicTimer = setInterval(() => {
+      if (!ac) return;
+      while (nextT < ac.currentTime + 0.25){
+        const note = BASSLINE[beat % BASSLINE.length];
+        musicNodes.bass.frequency.setValueAtTime(note, nextT);
+        if (beat % 2 === 0){ /* soft thump */
+          const o = ac.createOscillator(), g = ac.createGain();
+          o.type='sine';
+          o.frequency.setValueAtTime(130, nextT);
+          o.frequency.exponentialRampToValueAtTime(42, nextT+0.09);
+          g.gain.setValueAtTime(0.0001, nextT);
+          g.gain.exponentialRampToValueAtTime(musicOn && !muted ? 0.08 : 0.0001, nextT+0.008);
+          g.gain.exponentialRampToValueAtTime(0.0001, nextT+0.12);
+          o.connect(g).connect(ac.destination); o.start(nextT); o.stop(nextT+0.15);
+        }
+        beat++; nextT += stepDur*2;
+      }
+    }, 120);
+  }
+  return {
+    unlock(){ ctx(); startMusic(); },
+    pop(f=440){ const t=performance.now(); if(t-last<60) return; last=t; blip(f,0.16,'sine',0.14); },
+    boing(v=1){ const t=performance.now(); if(t-last<110) return; last=t; blip(140+90*v,0.22,'triangle',0.10); },
+    ding(){ blip(880,0.20,'sine',0.12); setTimeout(()=>blip(1320,0.18,'sine',0.08),60); },
+    fanfare(){ [660,830,990,1320].forEach((f,i)=>setTimeout(()=>blip(f,0.22,'sine',0.11),i*90)); },
+    thud(){ blip(90,0.25,'triangle',0.13); },
+    spicy(){ blip(220,0.3,'square',0.07,90); },
+    whoosh(){ blip(900,0.25,'sine',0.06,200); },
+    setMusic(on){ musicOn = on; if (musicNodes) musicNodes.master.gain.value = on ? 0.05 : 0; },
+    get muted(){ return muted; }, set muted(m){ muted = m; },
+  };
+})();
+$('mute').addEventListener('click', () => {
+  sfx.muted = !sfx.muted;
+  $('mute').textContent = sfx.muted ? '🔇' : '🔊';
+  $('mute').setAttribute('aria-pressed', String(sfx.muted));
+});
+$('musicbtn').addEventListener('click', () => {
+  const on = $('musicbtn').getAttribute('aria-pressed') !== 'true';
+  $('musicbtn').setAttribute('aria-pressed', String(on));
+  $('musicbtn').style.opacity = on ? 1 : 0.5;
+  sfx.setMusic(on);
+});
+
+/* ================= ACHIEVEMENTS ================= */
+const ACH = [
+  {id:'poke1',   ic:'👉', nm:'first poke',        ds:'hello bestie'},
+  {id:'jig50',   ic:'🕺', nm:'50 jiggles',        ds:'certified jelly rizzler'},
+  {id:'jig200',  ic:'🫠', nm:'200 jiggles',       ds:'down catastrophically bad'},
+  {id:'yeet',    ic:'🚀', nm:'yeet certified',    ds:'flung the jelly at mach speed'},
+  {id:'flavors', ic:'🌈', nm:'flavor nomad',      ds:'tried every single flavor'},
+  {id:'catch15', ic:'🍓', nm:'fruit goblin',      ds:'caught 15 in one round'},
+  {id:'combo10', ic:'🔥', nm:'locked in',         ds:'10 catch combo, zero misses'},
+  {id:'rush40',  ic:'⚡', nm:'lowkey cracked',    ds:'40+ pokes in wobble rush'},
+  {id:'giga',    ic:'👑', nm:'absolute unit',     ds:'found the giga jelly'},
+  {id:'named',   ic:'📛', nm:'emotional support dessert', ds:'gave your jelly a name'},
+];
+const unlocked = new Set(store.get('ach', []));
+let achQueue = [], achShowing = false;
+function award(id){
+  if (unlocked.has(id)) return;
+  unlocked.add(id);
+  store.set('ach', [...unlocked]);
+  achQueue.push(ACH.find(a=>a.id===id));
+  pumpAch();
+}
+function pumpAch(){
+  if (achShowing || !achQueue.length) return;
+  achShowing = true;
+  const a = achQueue.shift();
+  $('achtitle').textContent = a.nm;
+  $('achdesc').textContent = a.ds;
+  $('achpop').classList.add('show');
+  sfx.fanfare();
+  emojiBurst(W/2, H*0.2, ['🏆','✨','🎉'], 14);
+  setTimeout(() => { $('achpop').classList.remove('show'); setTimeout(()=>{ achShowing=false; pumpAch(); }, 450); }, 2400);
+}
+$('achbtn').addEventListener('click', () => { renderAch(); $('achpanel').classList.remove('hidden'); });
+$('achclose').addEventListener('click', () => $('achpanel').classList.add('hidden'));
+function renderAch(){
+  $('achcount').textContent = unlocked.size + ' / ' + ACH.length + ' unlocked · keep wobbling';
+  $('achlist').innerHTML = ACH.map(a => `
+    <div class="achrow ${unlocked.has(a.id)?'':'locked'}">
+      <div class="ic">${unlocked.has(a.id)?a.ic:'🔒'}</div>
+      <div><div class="nm">${a.nm}</div><div class="ds">${a.ds}</div></div>
+    </div>`).join('');
+}
+
+/* ================= SOFT BODY ================= */
+const N = 44;
+const blob = {
+  pts: [], rest: 0, A0: 0, cx: 0, cy: 0, avgR: 0,
+  happy: 0, blink: 0, nextBlink: 2,
+  init(scale){
+    const R = Math.max(72, Math.min(W,H)*0.16) * (scale||1);
+    const cxm = W/2, cym = FLOOR - R - 10;
+    this.pts = [];
+    for (let i=0;i<N;i++){
+      const a = i/N * Math.PI*2;
+      const x = cxm + Math.cos(a)*R, y = cym + Math.sin(a)*R;
+      this.pts.push({x, y, px:x, py:y});
+    }
+    this.rest = 2*Math.PI*R/N;
+    this.A0 = Math.PI*R*R;
+    this.measure();
+  },
+  measure(){
+    let sx=0, sy=0;
+    for (const p of this.pts){ sx+=p.x; sy+=p.y; }
+    this.cx = sx/N; this.cy = sy/N;
+    let sr=0;
+    for (const p of this.pts) sr += Math.hypot(p.x-this.cx, p.y-this.cy);
+    this.avgR = sr/N;
+  },
+  area(){
+    let a=0;
+    for (let i=0;i<N;i++){
+      const p=this.pts[i], q=this.pts[(i+1)%N];
+      a += p.x*q.y - q.x*p.y;
+    }
+    return Math.abs(a)/2;
+  },
+  impulse(x, y, power, sigma){
+    for (const p of this.pts){
+      const dx=p.x-x, dy=p.y-y, d2=dx*dx+dy*dy;
+      const d=Math.sqrt(d2)||1;
+      const f = power * Math.exp(-d2/(2*sigma*sigma));
+      p.px -= dx/d*f; p.py -= dy/d*f;
+    }
+  },
+  hop(v){ for (const p of this.pts) p.py += v; },
+  shiver(v){
+    if (reduceMotion) return;
+    for (const p of this.pts){ p.px += (Math.random()-0.5)*v; p.py += (Math.random()-0.5)*v; }
+  },
+  step(dt){
+    const G = 1050, damp = 0.988;
+    for (const p of this.pts){
+      const vx=(p.x-p.px)*damp, vy=(p.y-p.py)*damp;
+      p.px=p.x; p.py=p.y;
+      p.x+=vx; p.y+=vy + G*dt*dt;
+    }
+    let hit = 0;
+    for (let iter=0; iter<4; iter++){
+      for (let i=0;i<N;i++){
+        const p=this.pts[i], q=this.pts[(i+1)%N];
+        let dx=q.x-p.x, dy=q.y-p.y;
+        const d=Math.hypot(dx,dy)||1e-4;
+        const diff=(d-this.rest)/d*0.5;
+        dx*=diff; dy*=diff;
+        p.x+=dx; p.y+=dy; q.x-=dx; q.y-=dy;
+      }
+      this.measure();
+      const A=this.area();
+      const spread = (this.A0-A)/this.A0 * this.avgR * 0.30;
+      if (Math.abs(spread) > 0.001){
+        for (let i=0;i<N;i++){
+          const prev=this.pts[(i-1+N)%N], next=this.pts[(i+1)%N], p=this.pts[i];
+          let nx=next.y-prev.y, ny=-(next.x-prev.x);
+          const nl=Math.hypot(nx,ny)||1e-4; nx/=nl; ny/=nl;
+          if (nx*(p.x-this.cx)+ny*(p.y-this.cy) < 0){ nx=-nx; ny=-ny; }
+          p.x += nx*spread; p.y += ny*spread;
+        }
+      }
+      for (const p of this.pts){
+        if (p.y > FLOOR){ const vy=p.y-p.py; if (vy>7) hit=Math.max(hit,vy);
+          p.y=FLOOR; p.px=p.x-(p.x-p.px)*0.55; p.py=p.y+vy*0.45; }
+        if (p.x < 8){ const vx=p.x-p.px; if (-vx>7) hit=Math.max(hit,-vx); p.x=8; p.px=p.x+vx*0.5; }
+        if (p.x > W-8){ const vx=p.x-p.px; if (vx>7) hit=Math.max(hit,vx); p.x=W-8; p.px=p.x+vx*0.5; }
+        if (p.y < 4){ p.y=4; p.py=p.y-(p.y-p.py)*0.5; }
+      }
+    }
+    this.measure();
+    if (hit > 8){ sfx.boing(Math.min(1, hit/26)); shake(Math.min(8, hit*0.3)); }
+    this.happy = Math.max(0, this.happy - dt);
+    this.nextBlink -= dt;
+    if (this.nextBlink <= 0){ this.blink = 0.14; this.nextBlink = 2 + Math.random()*3.5; }
+    this.blink = Math.max(0, this.blink - dt);
+  },
+};
+blob.init();
+setInterval(() => {
+  if (!reduceMotion && !pointer.down && Math.random() < 0.5) blob.shiver(3.5);
+}, 2600);
+
+/* ================= SCREEN SHAKE ================= */
+let shakeAmt = 0;
+function shake(v){ if (!reduceMotion) shakeAmt = Math.min(18, Math.max(shakeAmt, v)); }
+
+/* ================= POINTER ================= */
+const pointer = { x:-999, y:-999, down:false, grab:-1, downT:0, downX:0, downY:0, hist:[] };
+function localXY(e){ const r = cv.getBoundingClientRect(); return [e.clientX-r.left, e.clientY-r.top]; }
+cv.addEventListener('pointerdown', e => {
+  if (mode.screen === 'splash') return;
+  cv.setPointerCapture(e.pointerId);
+  const [x,y] = localXY(e);
+  pointer.x=x; pointer.y=y; pointer.down=true; pointer.downT=performance.now();
+  pointer.downX=x; pointer.downY=y; pointer.hist=[[x,y,pointer.downT]];
+  let best=-1, bd=1e9;
+  blob.pts.forEach((p,i)=>{ const d=Math.hypot(p.x-x,p.y-y); if(d<bd){bd=d;best=i;} });
+  const inside = Math.hypot(blob.cx-x, blob.cy-y) < blob.avgR*1.25;
+  pointer.grab = (bd < 60 || inside) ? best : -1;
+  if (pointer.grab >= 0) cv.classList.add('grabbing');
+});
+cv.addEventListener('pointermove', e => {
+  const [x,y] = localXY(e);
+  pointer.x=x; pointer.y=y;
+  if (Math.random() < 0.35) sparkle(x, y);
+  if (pointer.down){
+    pointer.hist.push([x,y,performance.now()]);
+    if (pointer.hist.length>6) pointer.hist.shift();
+  }
+});
+function release(){
+  if (!pointer.down) return;
+  const dt = performance.now() - pointer.downT;
+  const moved = Math.hypot(pointer.x-pointer.downX, pointer.y-pointer.downY);
+  if (pointer.grab >= 0 && pointer.hist.length >= 2){
+    const [x0,y0,t0] = pointer.hist[0], [x1,y1,t1] = pointer.hist[pointer.hist.length-1];
+    const s = Math.max(0.016, (t1-t0)/1000);
+    const vx=(x1-x0)/s, vy=(y1-y0)/s;
+    const p = blob.pts[pointer.grab];
+    p.px = p.x - vx*0.016; p.py = p.y - vy*0.016;
+    const sp = Math.hypot(vx,vy);
+    if (sp > 500){ sfx.boing(0.8); addJiggle(1); toastMaybe('YEET'); }
+    if (sp > 1400){ award('yeet'); shake(10); }
+  }
+  if (dt < 220 && moved < 12) poke(pointer.downX, pointer.downY);
+  pointer.down=false; pointer.grab=-1; cv.classList.remove('grabbing');
+}
+cv.addEventListener('pointerup', release);
+cv.addEventListener('pointercancel', release);
+function poke(x, y){
+  blob.impulse(x, y, 26, blob.avgR*0.8);
+  blob.happy = 1.1;
+  const prox = 1 - Math.min(1, Math.hypot(blob.cx-x, blob.cy-y)/(blob.avgR*1.6));
+  sfx.pop(340 + prox*320);
+  jigWordmark();
+  award('poke1');
+  addJiggle(1);
+  if (mode.screen === 'rush') rushPoke(x, y);
+}
+addEventListener('keydown', e => {
+  if (e.target && e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space' && !e.repeat && mode.screen !== 'splash'){
+    e.preventDefault();
+    blob.hop(16); sfx.boing(0.7); addJiggle(1); jigWordmark();
+  }
+});
+
+/* ================= SCORE / TOAST ================= */
+let jiggles = store.get('jiggles', 0);
+const wm = $('wordmark');
+function jigWordmark(){ wm.classList.remove('jig'); void wm.offsetWidth; wm.classList.add('jig'); }
+function addJiggle(n){
+  if (mode.screen !== 'hub') return;
+  jiggles += n;
+  store.set('jiggles', jiggles);
+  $('score').textContent = jiggles;
+  if (jiggles >= 50) award('jig50');
+  if (jiggles >= 200) award('jig200');
+  if (jiggles>0 && jiggles % 25 === 0){
+    emojiBurst(blob.cx, blob.cy - blob.avgR, ['🍮','✨','💖'], 20);
+    toast(praise()); sfx.ding();
+  }
+}
+let toastT = null, lastToast = 0;
+function toast(msg){
+  $('toast').textContent = msg;
+  $('toast').classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>$('toast').classList.remove('show'), 1300);
+}
+function toastMaybe(msg){
+  const t = performance.now();
+  if (t - lastToast > 3500){ lastToast = t; toast(msg); }
+}
+let comboT = null;
+function comboText(msg, big){
+  const el = $('combo');
+  el.textContent = msg;
+  el.style.fontSize = big ? 'clamp(40px,8vw,84px)' : '';
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  clearTimeout(comboT);
+  comboT = setTimeout(()=>el.classList.remove('show'), 900);
+}
+
+/* ================= PARTICLES ================= */
+const parts = [];
+function confetti(x, y, n, color){
+  const c = jellyColors();
+  for (let i=0;i<n;i++){
+    const a = Math.random()*Math.PI*2, s = 120+Math.random()*260;
+    parts.push({ kind:'rect', x, y, vx:Math.cos(a)*s, vy:Math.sin(a)*s-160, life:0.7+Math.random()*0.5,
+      t:0, r:3+Math.random()*4, c: color || (Math.random()<0.5 ? c.solid : c.solid2),
+      rot:Math.random()*Math.PI, vr:(Math.random()-0.5)*10 });
+  }
+}
+function emojiBurst(x, y, set, n){
+  for (let i=0;i<n;i++){
+    const a = Math.random()*Math.PI*2, s = 140+Math.random()*300;
+    parts.push({ kind:'emoji', x, y, vx:Math.cos(a)*s, vy:Math.sin(a)*s-220, life:0.9+Math.random()*0.6,
+      t:0, r:11+Math.random()*10, c:set[Math.floor(Math.random()*set.length)],
+      rot:Math.random()*Math.PI, vr:(Math.random()-0.5)*8 });
+  }
+}
+function sparkle(x, y){
+  if (reduceMotion) return;
+  parts.push({ kind:'spark', x, y, vx:(Math.random()-0.5)*40, vy:(Math.random()-0.5)*40-30,
+    life:0.4+Math.random()*0.3, t:0, r:1.5+Math.random()*2, c:'rgba(255,255,255,.8)', rot:0, vr:0 });
+}
+function stepParts(dt){
+  for (const p of parts){
+    p.t+=dt;
+    if (p.kind!=='spark') p.vy+=900*dt;
+    p.x+=p.vx*dt; p.y+=p.vy*dt; p.rot+=p.vr*dt;
+  }
+  for (let i=parts.length-1;i>=0;i--) if (parts[i].t>parts[i].life) parts.splice(i,1);
+}
+
+/* background bubbles */
+const bubbles = Array.from({length:16}, () => ({
+  x:Math.random(), y:Math.random(), r:2+Math.random()*5, s:0.008+Math.random()*0.02, o:0.04+Math.random()*0.08
+}));
+
+/* ================= FLAVOR UI ================= */
+const flavorBar = $('flavors');
+FLAVORS.forEach(f => {
+  const b = document.createElement('button');
+  b.className = 'swatch'; b.title = f.name;
+  b.setAttribute('aria-label', f.name + ' flavor');
+  b.setAttribute('aria-pressed', f===flavor ? 'true' : 'false');
+  b.style.background = `linear-gradient(180deg, ${f.top}, ${f.deep})`;
+  b.addEventListener('click', () => {
+    flavor = f; giga = false;
+    document.documentElement.style.setProperty('--accent', f.main);
+    document.documentElement.style.setProperty('--accent-deep', f.deep);
+    document.documentElement.style.setProperty('--glow', f.glow);
+    [...flavorBar.children].forEach(c => c.setAttribute('aria-pressed', c===b ? 'true':'false'));
+    blob.shiver(9); sfx.pop(520); toast(f.name + '!');
+    flavorsTried.add(f.id);
+    store.set('flavors', [...flavorsTried]);
+    if (flavorsTried.size === FLAVORS.length) award('flavors');
+  });
+  flavorBar.appendChild(b);
+});
+
+/* ================= GIGA SECRET ================= */
+let logoClicks = 0, logoT = null;
+wm.addEventListener('click', () => {
+  jigWordmark(); sfx.pop(400 + logoClicks*60);
+  logoClicks++;
+  clearTimeout(logoT);
+  logoT = setTimeout(()=>{ logoClicks = 0; }, 1600);
+  if (logoClicks === 7){
+    logoClicks = 0;
+    giga = !giga;
+    blob.init(giga ? 1.65 : 1);
+    shake(14);
+    emojiBurst(W/2, H/2, ['👑','🍮','⚡','✨'], 30);
+    comboText(giga ? 'GIGA JELLY' : 'smol again', true);
+    sfx.fanfare();
+    if (giga) award('giga');
+  }
+});
+
+/* ================= NAME ================= */
+let jellyName = store.get('name', '');
+$('namebtn').addEventListener('click', () => {
+  $('nameinput').value = jellyName;
+  $('namemodal').classList.remove('hidden');
+  setTimeout(()=>$('nameinput').focus(), 50);
+});
+$('namecancel').addEventListener('click', () => $('namemodal').classList.add('hidden'));
+function saveName(){
+  const v = $('nameinput').value.trim();
+  $('namemodal').classList.add('hidden');
+  if (!v) return;
+  jellyName = v;
+  store.set('name', v);
+  award('named');
+  toast(v + ' has entered the chat');
+  emojiBurst(blob.cx, blob.cy - blob.avgR, ['💖','🍮','✨'], 16);
+  sfx.ding();
+}
+$('namesave').addEventListener('click', saveName);
+$('nameinput').addEventListener('keydown', e => { if (e.key === 'Enter') saveName(); });
+
+/* ================= SHARE ================= */
+$('sharebtn').addEventListener('click', async () => {
+  const data = { title:'nokluyet · the jellyverse', text:'i poked a jelly for 20 minutes. no regrets. 🍮', url:location.href };
+  try {
+    if (navigator.share){ await navigator.share(data); }
+    else { await navigator.clipboard.writeText(data.text + ' ' + data.url); toast('copied. go spread the wobble'); }
+  } catch(e){}
+});
+
+/* ================= MODES ================= */
+const mode = { screen:'splash' };
+const FRUITS = ['🍓','🥭','🫐','🍇','🥝','🍑'];
+const catchState = { score:0, misses:0, combo:0, bestCombo:0, fruits:[], spawnT:0 };
+const rushState = { score:0, timeLeft:0, combo:0, lastPoke:0, bestCombo:0 };
+let bestCatch = store.get('best-catch', 0);
+let bestRush = store.get('best-rush', 0);
+
+function setHubUI(on){
+  $('modes').classList.toggle('hidden', !on);
+  $('flavors').classList.toggle('hidden', !on);
+  $('hint').classList.toggle('hidden', !on);
+}
+function toHub(){
+  mode.screen = 'hub';
+  $('scorelabel').textContent = 'jiggles';
+  $('score').textContent = jiggles;
+  $('hearts').hidden = true;
+  $('timerbar').classList.add('hidden');
+  $('overlay').classList.add('hidden');
+  setHubUI(true);
+}
+
+/* ---- catch ---- */
+$('catchbtn').addEventListener('click', startCatch);
+function startCatch(){
+  mode.screen = 'catch';
+  Object.assign(catchState, { score:0, misses:0, combo:0, bestCombo:0, fruits:[], spawnT:0.5 });
+  $('scorelabel').textContent = 'caught';
+  $('score').textContent = '0';
+  $('hearts').hidden = false; drawHearts();
+  setHubUI(false);
+  toast('catch the fruit. dodge the chili.');
+}
+function drawHearts(){
+  $('hearts').textContent = ' ' + '❤'.repeat(Math.max(0,3-catchState.misses)) + '·'.repeat(catchState.misses);
+}
+function stepCatch(dt){
+  const st = catchState;
+  st.spawnT -= dt;
+  if (st.spawnT <= 0){
+    st.spawnT = Math.max(0.42, 1.05 - st.score*0.018);
+    const roll = Math.random();
+    let em, type;
+    if (roll < 0.07){ em='⭐'; type='gold'; }
+    else if (roll < 0.20 && st.score > 4){ em='🌶️'; type='chili'; }
+    else { em=FRUITS[Math.floor(Math.random()*FRUITS.length)]; type='fruit'; }
+    st.fruits.push({ x:40+Math.random()*(W-80), y:-24, vy:0, r:15+Math.random()*5,
+      em, type, rot:Math.random()*Math.PI, vr:(Math.random()-0.5)*4, dead:false });
+  }
+  const speed = 1 + st.score*0.028;
+  for (const fr of st.fruits){
+    fr.vy += 620*speed*dt;
+    fr.y += fr.vy*dt; fr.rot += fr.vr*dt;
+    if (!fr.dead && Math.hypot(fr.x-blob.cx, fr.y-blob.cy) < blob.avgR + fr.r*0.4){
+      fr.dead = true;
+      blob.impulse(fr.x, fr.y, 20, blob.avgR*0.7);
+      if (fr.type === 'chili'){
+        st.misses++; st.combo = 0; drawHearts();
+        shake(12); sfx.spicy();
+        comboText('SPICY. WHY.', false);
+        emojiBurst(fr.x, fr.y, ['🌶️','🔥','💀'], 10);
+        if (st.misses >= 3){ endCatch(); return; }
+        continue;
+      }
+      const pts = fr.type === 'gold' ? 5 : 1;
+      st.score += pts;
+      st.combo++;
+      st.bestCombo = Math.max(st.bestCombo, st.combo);
+      if (st.combo === 10) award('combo10');
+      $('score').textContent = st.score;
+      blob.happy = 0.9;
+      emojiBurst(fr.x, fr.y, fr.type==='gold' ? ['⭐','✨','💛'] : [fr.em,'✨'], fr.type==='gold' ? 14 : 7);
+      sfx.pop(560 + st.combo*30);
+      jigWordmark();
+      for (const [c, msg] of COMBO_TIERS){
+        if (st.combo === c){ comboText(msg + ' x' + c, c >= 15); sfx.ding(); shake(c/3); break; }
+      }
+      if (fr.type === 'gold') toastMaybe('STAR FRUIT. BIG W.');
+    }
+    if (!fr.dead && fr.y > FLOOR - fr.r*0.3){
+      fr.dead = true;
+      if (fr.type === 'chili'){ emojiBurst(fr.x, FLOOR, ['💨'], 4); continue; }
+      st.misses++; st.combo = 0; drawHearts();
+      confetti(fr.x, FLOOR, 8, '#8a7f92');
+      sfx.thud();
+      if (st.misses >= 3){ endCatch(); return; }
+    }
+  }
+  st.fruits = st.fruits.filter(f => !f.dead);
+}
+function endCatch(){
+  mode.screen = 'over';
+  catchState.fruits = [];
+  const s = catchState.score;
+  if (s >= 15) award('catch15');
+  if (s > bestCatch){ bestCatch = s; store.set('best-catch', s); }
+  const rank = s >= 40 ? 'JELLY DEITY 👑' : s >= 25 ? 'FRUIT GOBLIN 🔥' : s >= 12 ? 'lowkey cracked' : s >= 5 ? 'mid but cute' : 'npc behavior (affectionate)';
+  showResult('catch report', rank,
+    'caught <b>'+s+'</b> · best <b>'+bestCatch+'</b> · top combo <b>x'+catchState.bestCombo+'</b>', startCatch);
+}
+
+/* ---- rush ---- */
+$('rushbtn').addEventListener('click', startRush);
+let rushCountdownT = null;
+function startRush(){
+  mode.screen = 'rushpre';
+  Object.assign(rushState, { score:0, timeLeft:20, combo:0, lastPoke:0, bestCombo:0 });
+  $('scorelabel').textContent = 'pokes';
+  $('score').textContent = '0';
+  $('hearts').hidden = true;
+  setHubUI(false);
+  let n = 3;
+  comboText('3', true); sfx.pop(400);
+  clearInterval(rushCountdownT);
+  rushCountdownT = setInterval(() => {
+    n--;
+    if (n > 0){ comboText(String(n), true); sfx.pop(400 + (3-n)*120); }
+    else {
+      clearInterval(rushCountdownT);
+      comboText('WOBBLE!!', true); sfx.fanfare();
+      mode.screen = 'rush';
+      $('timerbar').classList.remove('hidden');
+    }
+  }, 700);
+}
+function rushPoke(x, y){
+  if (Math.hypot(blob.cx-x, blob.cy-y) > blob.avgR*1.6){ toastMaybe('poke the JELLY bestie'); return; }
+  const st = rushState;
+  const now = performance.now();
+  st.combo = (now - st.lastPoke < 900) ? st.combo + 1 : 1;
+  st.lastPoke = now;
+  st.bestCombo = Math.max(st.bestCombo, st.combo);
+  st.score++;
+  $('score').textContent = st.score;
+  confetti(x, y, 5);
+  shake(Math.min(10, 2 + st.combo*0.25));
+  for (const [c, msg] of COMBO_TIERS){
+    if (st.combo === c){ comboText(msg, c >= 15); sfx.ding(); break; }
+  }
+}
+function stepRush(dt){
+  const st = rushState;
+  st.timeLeft -= dt;
+  $('timerbar').style.transform = 'scaleX(' + Math.max(0, st.timeLeft/20) + ')';
+  if (st.timeLeft <= 0) endRush();
+}
+function endRush(){
+  mode.screen = 'over';
+  $('timerbar').classList.add('hidden');
+  const s = rushState.score;
+  if (s >= 40) award('rush40');
+  if (s > bestRush){ bestRush = s; store.set('best-rush', s); }
+  const rank = s >= 60 ? 'TOUCH GRASS (affectionate) 🌱' : s >= 40 ? 'ABSOLUTELY CRACKED ⚡' : s >= 25 ? 'jelly rizzler' : s >= 12 ? 'warming up fr' : 'npc behavior (affectionate)';
+  showResult('rush report', rank,
+    '<b>'+s+'</b> pokes in 20s · best <b>'+bestRush+'</b> · top combo <b>x'+rushState.bestCombo+'</b>', startRush);
+}
+
+/* ---- result overlay ---- */
+let againFn = null;
+function showResult(title, rank, html, again){
+  $('cardtitle').textContent = title;
+  $('cardrank').textContent = rank;
+  $('cardtext').innerHTML = html;
+  againFn = again;
+  $('overlay').classList.remove('hidden');
+  sfx.whoosh();
+  emojiBurst(W/2, H*0.35, ['🍮','✨','🎉'], 18);
+}
+$('again').addEventListener('click', () => { $('overlay').classList.add('hidden'); if (againFn) againFn(); });
+$('chill').addEventListener('click', toHub);
+
+/* ================= SPLASH ================= */
+'nokluyet'.split('').forEach((ch, i) => {
+  const s = document.createElement('span');
+  s.textContent = ch;
+  s.style.animationDelay = (0.15 + i*0.07) + 's';
+  $('splashword').appendChild(s);
+});
+let loadIdx = 0;
+const loadT = setInterval(() => {
+  loadIdx++;
+  if (loadIdx < LOADLINES.length) $('loadline').textContent = LOADLINES[loadIdx];
+  else { $('loadline').textContent = 'jelly is ready. are you?'; clearInterval(loadT); }
+}, 800);
+$('enter').addEventListener('click', () => {
+  sfx.unlock();
+  sfx.fanfare();
+  $('splash').classList.add('gone');
+  toHub();
+  blob.hop(20);
+  emojiBurst(W/2, H/2, ['🍮','✨','💖','🫧'], 26);
+  setTimeout(()=>toast('welcome to the jellyverse'), 500);
+});
+
+/* tagline rotator */
+let tagIdx = 0;
+setInterval(() => {
+  if (mode.screen !== 'hub') return;
+  const el = $('tagline');
+  el.classList.add('fade');
+  setTimeout(() => {
+    tagIdx = (tagIdx+1) % TAGLINES.length;
+    el.textContent = TAGLINES[tagIdx];
+    el.classList.remove('fade');
+  }, 420);
+}, 5200);
+
+/* ================= RENDER ================= */
+function draw(dt){
+  cx.setTransform(DPR,0,0,DPR,0,0);
+  if (shakeAmt > 0.2){
+    cx.translate((Math.random()-0.5)*shakeAmt, (Math.random()-0.5)*shakeAmt);
+    shakeAmt *= Math.pow(0.001, dt);
+  } else shakeAmt = 0;
+
+  const C = jellyColors();
+  if (giga) gigaHue = (gigaHue + dt*60) % 360;
+
+  const bg = cx.createRadialGradient(W/2, H*0.4, 0, W/2, H*0.4, Math.max(W,H)*0.75);
+  bg.addColorStop(0, '#2A1140'); bg.addColorStop(1, '#12081D');
+  cx.fillStyle = bg; cx.fillRect(-20,-20,W+40,H+40);
+
+  /* ambient bubbles */
+  for (const b of bubbles){
+    b.y -= b.s*dt*10;
+    if (b.y < -0.05){ b.y = 1.05; b.x = Math.random(); }
+    cx.beginPath();
+    cx.arc(b.x*W, b.y*H, b.r, 0, Math.PI*2);
+    cx.fillStyle = 'rgba(251,243,247,'+b.o+')';
+    cx.fill();
+  }
+
+  const gl = cx.createRadialGradient(blob.cx, blob.cy, 0, blob.cx, blob.cy, blob.avgR*3.2);
+  gl.addColorStop(0, C.glow); gl.addColorStop(1, 'rgba(0,0,0,0)');
+  cx.fillStyle = gl; cx.fillRect(0,0,W,H);
+
+  cx.fillStyle = 'rgba(251,243,247,.05)';
+  cx.fillRect(-20, FLOOR, W+40, H-FLOOR+20);
+  cx.beginPath();
+  cx.ellipse(blob.cx, FLOOR+8, blob.avgR*1.15, 12, 0, 0, Math.PI*2);
+  cx.fillStyle = 'rgba(0,0,0,.35)'; cx.fill();
+
+  /* fruits */
+  if (mode.screen === 'catch'){
+    for (const fr of catchState.fruits){
+      cx.save(); cx.translate(fr.x, fr.y); cx.rotate(fr.rot*0.4);
+      cx.font = (fr.r*2.1) + 'px serif';
+      cx.textAlign = 'center'; cx.textBaseline = 'middle';
+      cx.fillText(fr.em, 0, 0);
+      cx.restore();
+    }
+  }
+
+  /* jelly */
+  const P = blob.pts;
+  cx.beginPath();
+  let mx = (P[0].x+P[1].x)/2, my = (P[0].y+P[1].y)/2;
+  cx.moveTo(mx, my);
+  for (let i=1;i<=N;i++){
+    const p = P[i%N], q = P[(i+1)%N];
+    cx.quadraticCurveTo(p.x, p.y, (p.x+q.x)/2, (p.y+q.y)/2);
+  }
+  cx.closePath();
+  const jg = cx.createLinearGradient(blob.cx, blob.cy-blob.avgR, blob.cx, blob.cy+blob.avgR);
+  jg.addColorStop(0, C.top); jg.addColorStop(0.55, C.main); jg.addColorStop(1, C.deep);
+  cx.fillStyle = jg;
+  cx.shadowColor = C.glow; cx.shadowBlur = 40;
+  cx.fill();
+  cx.shadowBlur = 0;
+  cx.strokeStyle = 'rgba(255,255,255,.22)'; cx.lineWidth = 2.5; cx.stroke();
+  cx.save(); cx.clip();
+  cx.beginPath();
+  cx.ellipse(blob.cx - blob.avgR*0.32, blob.cy - blob.avgR*0.45, blob.avgR*0.42, blob.avgR*0.2, -0.45, 0, Math.PI*2);
+  cx.fillStyle = 'rgba(255,255,255,.34)'; cx.fill();
+  cx.beginPath();
+  cx.ellipse(blob.cx + blob.avgR*0.4, blob.cy - blob.avgR*0.2, blob.avgR*0.1, blob.avgR*0.05, 0.4, 0, Math.PI*2);
+  cx.fillStyle = 'rgba(255,255,255,.25)'; cx.fill();
+  cx.restore();
+
+  /* face */
+  const r = blob.avgR, fx = blob.cx, fy = blob.cy;
+  const dark = (!giga && flavor.id === 'lychee') ? '#7A3B58' : '#3A1230';
+  const eyeDX = r*0.34, eyeY = fy - r*0.10, eyeR = r*0.115;
+  let lx = pointer.x - fx, ly = pointer.y - eyeY;
+  const ld = Math.hypot(lx,ly)||1; const look = Math.min(1, ld/300)*eyeR*0.34;
+  lx = lx/ld*look; ly = ly/ld*look;
+  const squint = blob.happy > 0;
+  const blinkS = blob.blink > 0 ? 0.12 : 1;
+  for (const s of [-1,1]){
+    const ex = fx + s*eyeDX;
+    if (squint){
+      cx.beginPath();
+      cx.arc(ex, eyeY + eyeR*0.4, eyeR*1.05, Math.PI*1.15, Math.PI*1.85);
+      cx.strokeStyle = dark; cx.lineWidth = r*0.055; cx.lineCap='round'; cx.stroke();
+    } else {
+      cx.save(); cx.translate(ex, eyeY); cx.scale(1, blinkS);
+      cx.beginPath(); cx.arc(0,0,eyeR,0,Math.PI*2); cx.fillStyle = dark; cx.fill();
+      if (blinkS === 1){
+        cx.fillStyle = 'rgba(255,255,255,.9)';
+        cx.beginPath(); cx.arc(lx*0.6 - eyeR*0.2, ly*0.6 - eyeR*0.25, eyeR*0.3, 0, Math.PI*2); cx.fill();
+      }
+      cx.restore();
+    }
+  }
+  const open = squint ? r*0.16 : r*0.10;
+  cx.beginPath();
+  cx.arc(fx, fy + r*0.18, open, 0.15*Math.PI, 0.85*Math.PI);
+  cx.strokeStyle = dark; cx.lineWidth = r*0.05; cx.lineCap = 'round'; cx.stroke();
+  cx.globalAlpha = 0.35;
+  for (const s of [-1,1]){
+    cx.beginPath(); cx.ellipse(fx + s*r*0.52, fy + r*0.10, r*0.09, r*0.055, 0, 0, Math.PI*2);
+    cx.fillStyle = (!giga && flavor.id==='lychee') ? '#F27BAA' : '#FFFFFF'; cx.fill();
+  }
+  cx.globalAlpha = 1;
+
+  /* crown + name */
+  if (giga){
+    cx.font = (r*0.5) + 'px serif';
+    cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.fillText('👑', fx, fy - r - r*0.25);
+  }
+  if (jellyName){
+    cx.font = '800 ' + Math.max(14, r*0.17) + 'px ' + '"Arial Rounded MT Bold", ui-rounded, system-ui';
+    cx.textAlign = 'center'; cx.textBaseline = 'bottom';
+    cx.fillStyle = 'rgba(251,243,247,.85)';
+    cx.fillText(jellyName, fx, fy - r - (giga ? r*0.55 : r*0.18));
+  }
+
+  /* particles */
+  for (const p of parts){
+    cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot);
+    cx.globalAlpha = Math.max(0, 1 - p.t/p.life);
+    if (p.kind === 'emoji'){
+      cx.font = (p.r*2) + 'px serif';
+      cx.textAlign = 'center'; cx.textBaseline = 'middle';
+      cx.fillText(p.c, 0, 0);
+    } else {
+      cx.fillStyle = p.c;
+      const rr = p.r;
+      cx.beginPath();
+      if (cx.roundRect) cx.roundRect(-rr,-rr,rr*2,rr*2,rr*0.6); else cx.rect(-rr,-rr,rr*2,rr*2);
+      cx.fill();
+    }
+    cx.restore();
+  }
+  cx.globalAlpha = 1;
+}
+
+/* ================= LOOP ================= */
+let lastT = performance.now();
+function frame(t){
+  let dt = Math.min(0.033, (t - lastT)/1000); lastT = t;
+  if (pointer.down && pointer.grab >= 0){
+    const p = blob.pts[pointer.grab];
+    p.x += (pointer.x - p.x)*0.42;
+    p.y += (pointer.y - p.y)*0.42;
+    for (const off of [-2,-1,1,2]){
+      const q = blob.pts[(pointer.grab+off+N)%N];
+      q.x += (pointer.x - q.x)*0.10/Math.abs(off);
+      q.y += (pointer.y - q.y)*0.10/Math.abs(off);
+    }
+  }
+  for (let i=0;i<2;i++) blob.step(dt/2);
+  if (mode.screen === 'catch') stepCatch(dt);
+  if (mode.screen === 'rush') stepRush(dt);
+  stepParts(dt);
+  draw(dt);
+  requestAnimationFrame(frame);
+}
+$('score').textContent = jiggles;
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
