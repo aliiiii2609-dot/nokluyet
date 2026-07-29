@@ -1177,7 +1177,9 @@ function openHire(){
       if (line[ci-1] !== ' ') sfx.type();
     } else { out += '\n'; li++; ci = 0; }
     term.innerHTML = out.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '<span class="cur"></span>';
-  }, reduceMotion ? 4 : 26);
+    const hs = $('hirescreen');
+    hs.scrollTop = hs.scrollHeight;
+  }, reduceMotion ? 4 : 24);
 }
 $('hireback').addEventListener('click', () => { clearInterval(hireTimer); toHub(); });
 $('dealbtn').addEventListener('click', () => {
