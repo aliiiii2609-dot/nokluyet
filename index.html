@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0B0614">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>NOKLUYET · jelly arcade</title>
 <meta name="description" content="is it a snack? is it a beverage? is it a dessert? nokluyet. build your jelly. poke your jelly. become your jelly.">
 <meta property="og:title" content="NOKLUYET · jelly arcade">
@@ -23,7 +26,8 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
   body{background:var(--bg0); color:var(--milk); font-family:var(--vt); overflow:hidden;
-    touch-action:none; -webkit-user-select:none; user-select:none; -webkit-tap-highlight-color:transparent}
+    touch-action:none; -webkit-user-select:none; user-select:none; -webkit-tap-highlight-color:transparent;
+    overscroll-behavior:none; position:fixed; inset:0}
   #stage{position:fixed; inset:0; width:100vw; height:100vh; image-rendering:pixelated;
     image-rendering:crisp-edges; cursor:grab}
   #stage.grabbing{cursor:grabbing}
@@ -262,7 +266,34 @@
   }
   @media (max-width:640px){
     #tagline,#hint{display:none}
-    .chip{font-size:10px; padding:7px 9px}
+    .chip{font-size:10px; padding:7px 9px; gap:6px}
+    #brand{left:12px}
+    #topright{right:10px; gap:6px}
+    .iconbtn{width:33px; height:33px; font-size:14px}
+    #bottom{gap:9px; bottom:max(12px,env(safe-area-inset-bottom))}
+    #flavors{gap:9px}
+    .swatch{width:23px; height:23px}
+    #modes{gap:6px; padding:0 6px}
+    .modebtn{font-size:8.5px; padding:10px 9px}
+    .card{padding:18px 14px; max-width:94vw}
+    .card h2{font-size:13px}
+    .card .sub{font-size:16px}
+    .opt{min-width:70px; padding:9px 8px; gap:5px}
+    .opt .big{font-size:21px}
+    .statrow{font-size:9px}
+    .statrow .bar{font-size:16px}
+    #popup{width:min(94vw,480px)}
+    #popbody{grid-template-columns:104px 1fr; gap:8px 10px; padding:10px 10px 12px}
+    #popcap{font-size:8px; line-height:1.8}
+    #popemoji{font-size:18px; letter-spacing:5px}
+    #popbtns button{font-size:8px; padding:9px 8px}
+    #popbar{font-size:8px}
+    #achpop{width:max-content; max-width:92vw}
+    #achpop .tt{font-size:9.5px}
+    #terminal{height:44vh; font-size:17px}
+    #hirebtns button{font-size:10px; padding:12px 12px}
+    #toast{top:12%}
+    #combo{top:24%}
   }
 </style>
 </head>
@@ -428,7 +459,7 @@ let W=0, H=0, FLOOR=0;
 function resize(){
   W = Math.ceil(innerWidth/PIX); H = Math.ceil(innerHeight/PIX);
   cv.width = W; cv.height = H;
-  FLOOR = H - Math.max(24, H*0.10);
+  FLOOR = H - (innerWidth < 640 ? Math.max(46, H*0.19) : Math.max(24, H*0.10));
 }
 addEventListener('resize', resize); resize();
 
@@ -663,7 +694,7 @@ const blob = {
   init(){
     const m = jelly ? MOLDS.find(x=>x.id===jelly.mold) || MOLDS[0] : MOLDS[0];
     const scale = giga ? 1.6 : 1;
-    const R = Math.max(22, Math.min(W,H)*0.155) * scale;
+    const R = Math.max(24, Math.min(W,H)*(innerWidth < 640 ? 0.20 : 0.155)) * scale;
     const rx = R*m.rx, ry = R*m.ry;
     const cxm = W/2, cym = FLOOR - ry - 4;
     this.pts = [];
