@@ -346,6 +346,7 @@
     <button class="modebtn" id="rushbtn">⚡ rush</button>
     <button class="modebtn" id="newbtn">🧪 new jelly</button>
     <button class="modebtn" id="hirebtn">🤝 HIRE ME</button>
+    <button class="modebtn" id="evbtn">📁 evidence.zip</button>
   </div>
   <div id="hint">poke. drag. yeet. spacebar to bounce. logo x7 for a secret.</div>
 </div>
@@ -1369,7 +1370,7 @@ $('pressstart').addEventListener('click', () => {
     setTimeout(openFactory, 350);
   }
   emojiBurst(W/2, H/2, ['🍮','✨','🫧'], 20);
-  schedulePopup(12000);
+  schedulePopup(9000);
 });
 
 /* ============ CONFESSION DIALOG ============ */
@@ -1433,6 +1434,9 @@ function closePopup(msg){
   if (msg) toast(msg);
   schedulePopup(90000 + Math.random()*90000);
 }
+$('evbtn').addEventListener('click', () => {
+  if (!pop.open){ openPopup(); toast('opening the evidence…'); }
+});
 $('popx').addEventListener('click', () => { sfx.pop(300); closePopup(''); });
 $('popyes').addEventListener('click', () => {
   sfx.ding();
