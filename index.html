@@ -388,7 +388,7 @@ const store = {
 const MYSTERY = ['is it a snack?','is it a beverage?','is it a dessert?','nokluyet.','(no clue yet)','exactly.'];
 const TAGLINES = [
   'is it a snack? is it a beverage?','is it a dessert? nokluyet.','no thoughts. just wobble.',
-  'scene? jelly. bas.','17,000 people are waiting fr.','ekdum bussin, no cap.',
+  'scene? jelly. bas.','the waitlist is famously long fr.','ekdum bussin, no cap.',
   'the softest arcade on the internet.','wobble responsibly.','aura: unlimited.','pov: the good website.',
 ];
 const PRAISE = ['SHEEEESH','W JELLY','NO CAP','GOATED','BUSSIN','ABSOLUTE CINEMA','PEAK JIGGLE','EKDUM FRESH','LOWKEY ICONIC','RIZZ +1000'];
@@ -1202,7 +1202,7 @@ function fcBirth(){
   award('built');
   const m = MOLDS.find(x=>x.id===jelly.mold), t = TOPPINGS.find(x=>x.id===jelly.topping);
   const statline = STATS.map((s,i)=>s+' '+jelly.stats[i]).join(' · ');
-  fcSet('🎂 jelly born', 'unit #' + (Math.floor(Math.random()*16999)+1) + ' of 17,000',
+  fcSet('🎂 jelly born', 'batch #' + (Math.floor(Math.random()*9000)+1000) + ' · limited edition fr',
     `<div class="cert">
       <div class="t">CERTIFICATE OF WOBBLE</div>
       name: <b>${nm}</b><br>
@@ -1235,9 +1235,9 @@ const HIRE_LINES = [
   '> (no clue yet. the self awareness is crazy.)',
   '',
   '> but real talk:',
-  '> the best things start with no clue yet.',
-  '> exhibit A: a jelly company with 17,000',
-  '> people waiting for a mystery in a cup.',
+  '> you named the whole company "no clue yet"',
+  '> and thousands joined the waitlist anyway.',
+  '> so clearly, starting clueless works.',
   '',
   '> i learn fast. i ship faster.',
   '> i built this entire arcade for a jelly',
